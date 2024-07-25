@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -35,7 +34,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Future<void> _fetchInitialStatus() async {
-    final doc = await _firestore.collection('users').doc(_auth.currentUser!.uid).get();
+    final doc =
+        await _firestore.collection('users').doc(_auth.currentUser!.uid).get();
     if (doc.exists) {
       setState(() {
         _isLookingForTeam = doc.data()?['isLookingForTeam'] ?? false;
@@ -70,9 +70,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
       try {
         List<String> experienceProofUrls = [];
         for (File file in _experienceProofFiles) {
-          Reference storageReference = FirebaseStorage.instance
-              .ref()
-              .child('experience_proofs/${userId}_${experienceProofUrls.length}.jpg');
+          Reference storageReference = FirebaseStorage.instance.ref().child(
+              'experience_proofs/${userId}_${experienceProofUrls.length}.jpg');
           UploadTask uploadTask = storageReference.putFile(file);
           TaskSnapshot taskSnapshot = await uploadTask;
           String experienceProofUrl = await taskSnapshot.ref.getDownloadURL();
@@ -103,7 +102,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     final pickedFiles = await picker.pickMultiImage();
     if (pickedFiles != null) {
       setState(() {
-        _experienceProofFiles = pickedFiles.map((file) => File(file.path)).toList();
+        _experienceProofFiles =
+            pickedFiles.map((file) => File(file.path)).toList();
       });
       await _uploadExperienceProofs(_auth.currentUser!.uid);
     }
@@ -144,7 +144,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ),
       ),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: _firestore.collection('users').doc(_auth.currentUser!.uid).snapshots(),
+        stream: _firestore
+            .collection('users')
+            .doc(_auth.currentUser!.uid)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -160,7 +163,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
           final userData = snapshot.data!.data() as Map<String, dynamic>?;
           _aboutController.text = userData?['aboutDetails'] ?? '';
-          List<String>? experienceProofUrls = userData?['experienceProofUrls']?.cast<String>();
+          List<String>? experienceProofUrls =
+              userData?['experienceProofUrls']?.cast<String>();
 
           return SingleChildScrollView(
             child: Column(
@@ -175,10 +179,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         children: [
                           CircleAvatar(
                             radius: 50,
-                            backgroundImage: userData?['profilePictureUrl'] != null
+                            backgroundImage: userData?['profilePictureUrl'] !=
+                                    null
                                 ? NetworkImage(userData!['profilePictureUrl'])
                                 : null,
-                            child: userData?['profilePictureUrl'] == null ? const Icon(Icons.person) : null,
+                            child: userData?['profilePictureUrl'] == null
+                                ? const Icon(Icons.person)
+                                : null,
                           ),
                           if (userData?['userType'] == 'Professional Player')
                             IconButton(
@@ -231,7 +238,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     ? IconButton(
                                         onPressed: () {
                                           _updateAboutDetails(
-                                              _auth.currentUser!.uid, _aboutController.text);
+                                              _auth.currentUser!.uid,
+                                              _aboutController.text);
                                         },
                                         icon: const Icon(Icons.check),
                                       )
@@ -254,19 +262,24 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       ElevatedButton(
                         onPressed: _toggleLookingForTeam,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _isLookingForTeam ? Colors.green : Colors.blue,
+                          backgroundColor:
+                              _isLookingForTeam ? Colors.green : Colors.blue,
                         ),
                         child: Text(
-                          _isLookingForTeam ? 'Looking for a team' : 'Already in a team',
+                          _isLookingForTeam
+                              ? 'Looking for a team'
+                              : 'Already in a team',
                           style: GoogleFonts.poppins(),
                         ),
                       ),
                     ],
                   ),
                 ),
-                if (experienceProofUrls != null && experienceProofUrls.isNotEmpty)
+                if (experienceProofUrls != null &&
+                    experienceProofUrls.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
                     child: SizedBox(
                       height: 100,
                       child: ListView.builder(
@@ -274,14 +287,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         itemCount: experienceProofUrls.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
                             child: GestureDetector(
                               onTap: () {
                                 showDialog(
                                   context: context,
                                   builder: (context) {
                                     return Dialog(
-                                      child: Image.network(experienceProofUrls[index]),
+                                      child: Image.network(
+                                          experienceProofUrls[index]),
                                     );
                                   },
                                 );
@@ -292,7 +307,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8.0),
                                   image: DecorationImage(
-                                    image: NetworkImage(experienceProofUrls[index]),
+                                    image: NetworkImage(
+                                        experienceProofUrls[index]),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
